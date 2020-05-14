@@ -5,7 +5,8 @@ module.exports = {
   findById,
   findSteps,
   add,
-  update
+  update,
+  remove
 };
 function find() {
   return db("schemes");
@@ -31,6 +32,11 @@ async function update(changes, id) {
   await db("schemes")
     .where({ id })
     .update(changes);
-
   return findById(id);
+}
+
+function remove(id) {
+  return db("schemes")
+    .where({ id })
+    .del();
 }
