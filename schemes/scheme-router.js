@@ -63,26 +63,40 @@ router.post("/", (req, res) => {
     });
 });
 
-router.post("/:id/steps", (req, res) => {
-  const stepData = req.body;
-  const { id } = req.params;
+router.post("/:id/steps", async (req, res, next) => {
+  try {
+    const stepData = req.body;
+    const { id } = req.params;
+    if (!stepData) {
+      return res.status(401).json({
+        message: "stepData should be filled "
+      });
+    }
+    const newStep = await Schemes.addStep(stepData, id);
+    if (newStep) {
+      res.json(newStep);
+    } else {
+      return res.status(401).json({ message: "Not found" });
+    }
+  } catch (err) {
+    next(err);
+  }
 
-  Schemes.findById(id)
-    .then(scheme => {
-      if (scheme) {
-        Schemes.addStep(stepData, id).then(step => {
-          res.status(201).json(step);
-        });
-      } else {
-        res
-          .status(404)
-          .json({ message: "Could not find scheme with given id." });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ message: "Failed to create new step" });
-    });
+  // .then(scheme => {
+  //   if (scheme) {
+  //     Schemes.addStep(stepData, id).then(step => {
+  //       res.status(201).json(step);
+  //     });
+  //   } else {
+  //     res
+  //       .status(404)
+  //       .json({ message: "Could not find scheme with given id." });
+  //   }
+  // })
+  // .catch(err => {
+  //   console.log(err);
+  //   res.status(500).json({ message: "Failed to create new step" });
+  // });
 });
 
 router.put("/:id", (req, res) => {
